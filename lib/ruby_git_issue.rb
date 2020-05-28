@@ -30,8 +30,13 @@ class RubyGitIssue
   # column_id ## Integer => Get column id from project and its columns
   # column_id can be blank as well. Issue will not be assigned to and project column if column_id is blank
   def generate_issue(column_id=nil)
-    issue_data = client.create_issue("#{organization}/#{repo}", issue_options[:title], compose_body(exception_data, request), issue_options)
-    add_issue_to_project(issue_data, column_id) unless column_id.nil?
+    existing_issue = client.list_issues("#{organization}/#{repo}").select{|issue| issue[:title] == issue_options[:title]}.try(:first)
+    if existing_issue.nil?
+      issue_data = client.create_issue("#{organization}/#{repo}", issue_options[:title], compose_body(exception_data, request), issue_options)
+      add_issue_to_project(issue_data, column_id) unless column_id.nil?
+    else
+      client.add_comment("#{organization}/#{repo}", existing_issue.number, compose_body(exception_data, request))
+    end
   end
 
   # Get Github project based on the organization passed while initializing client
