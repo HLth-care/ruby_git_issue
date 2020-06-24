@@ -32,7 +32,7 @@ class RubyGitIssue
   def generate_issue(column_id=nil)
     existing_issue = client.list_issues("#{organization}/#{repo}").select{|issue| issue[:title] == issue_options[:title]}.try(:first)
     if existing_issue.nil?
-      issue_data = client.create_issue("#{organization}/#{repo}", issue_options[:title], compose_body(exception_data, request), issue_options)
+      issue_data = client.create_issue("#{organization}/#{repo}", issue_options[:title][0..255], compose_body(exception_data, request), issue_options)
       add_issue_to_project(issue_data, column_id) unless column_id.nil?
     else
       client.add_comment("#{organization}/#{repo}", existing_issue.number, compose_body(exception_data, request))
