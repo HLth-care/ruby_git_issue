@@ -80,6 +80,7 @@ class RubyGitIssue
     body << compose_request_section(e, request) unless request.nil?
     body << "\n\n"
     body << compose_backtrace_section(e) unless e.nil?
+    body[0..65535]
   end
 
   def compose_data_section(e,data )
